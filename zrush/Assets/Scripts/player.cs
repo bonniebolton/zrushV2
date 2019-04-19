@@ -69,6 +69,17 @@ public class player : MonoBehaviour
                     pickaxe.GetComponent<AudioSource>().Play();
                     GetComponent<ParticleSystem>().Emit(30);
                 }
+                if (Input.GetMouseButtonDown(0) && hit.transform.tag == "placed")
+                {
+                    hit.transform.gameObject.GetComponent<placedObject>().takeDamage(10);
+                    wood += 1;
+                    resource1.text = "Wood: " + wood;
+
+                    pickaxe.GetComponent<Animator>().SetTrigger("play");
+                    pickaxe.GetComponent<AudioSource>().pitch = Random.Range(3, 5);
+                    pickaxe.GetComponent<AudioSource>().Play();
+                    GetComponent<ParticleSystem>().Emit(30);
+                }
             }
         }
 

@@ -144,13 +144,18 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
             if ((Mathf.Abs(input.x) > float.Epsilon || Mathf.Abs(input.y) > float.Epsilon) && (advancedSettings.airControl || m_IsGrounded))
             {
+                var speedMult = 1f;
+                if (advancedSettings.airControl && !m_IsGrounded)
+                {
+                    speedMult = .75f;
+                }
                 // always move along the camera forward as it is the direction that it being aimed at
                 Vector3 desiredMove = cam.transform.forward*input.y + cam.transform.right*input.x;
                 desiredMove = Vector3.ProjectOnPlane(desiredMove, m_GroundContactNormal).normalized;
 
-                desiredMove.x = desiredMove.x*movementSettings.CurrentTargetSpeed;
-                desiredMove.z = desiredMove.z*movementSettings.CurrentTargetSpeed;
-                desiredMove.y = desiredMove.y*movementSettings.CurrentTargetSpeed;
+                desiredMove.x = desiredMove.x*movementSettings.CurrentTargetSpeed*speedMult;
+                desiredMove.z = desiredMove.z*movementSettings.CurrentTargetSpeed*speedMult;
+                desiredMove.y = desiredMove.y*movementSettings.CurrentTargetSpeed*speedMult;
 
 
                 if (m_RigidBody.velocity.sqrMagnitude <
@@ -179,7 +184,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
             }
             else
             {
-                m_RigidBody.drag = 0f;
+                m_RigidBody.drag = 2f;
                 if (m_PreviouslyGrounded && !m_Jumping)
                 {
                     StickToGroundHelper();
