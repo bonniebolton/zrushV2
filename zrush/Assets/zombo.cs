@@ -15,6 +15,8 @@ public class zombo : MonoBehaviour
     [HideInInspector]
     public float coolDown;
 
+    private Animator anim;
+
 
     // Start is called before the first frame update
     void Start()
@@ -22,6 +24,7 @@ public class zombo : MonoBehaviour
         player = GameObject.FindGameObjectWithTag("Player");
         target = player;
         rb = GetComponent<Rigidbody>();
+        anim = GetComponent<Animator>();
     }
 
     // Update is called once per frame
@@ -32,15 +35,22 @@ public class zombo : MonoBehaviour
             coolDown = 0;
             target = player;
             isMove = true;
+            anim.SetBool("isMove", true);
         }
         else if (target != player)
         {
             isMove = false;
+            anim.SetBool("isMove", false);
         }
 
         //transform.LookAt(target.transform);
 
         var lookPos = target.transform.position - transform.position;
+
+        anim.SetBool("isMove", isMove);
+        anim.SetFloat("Distance", (Vector3.Distance(target.transform.position, transform.position))/10);
+
+
         lookPos.y = 0;
         var rotation = Quaternion.LookRotation(lookPos);
         transform.rotation = Quaternion.Slerp(transform.rotation, rotation, Time.deltaTime * 5);
@@ -57,6 +67,7 @@ public class zombo : MonoBehaviour
         if (other.tag == "Player")
         {
             isMove = false;
+            anim.SetTrigger("AttackPlayer");
             print("hurt the player");
         }
         else if (other.tag == "placed")
@@ -71,6 +82,7 @@ public class zombo : MonoBehaviour
         {
             if (coolDown % 60 == 0)
             {
+                anim.SetTrigger("AttackBox");
                 other.GetComponent<placedObject>().takeDamage(5);
                 print("punch box");
             }
