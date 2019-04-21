@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class player : MonoBehaviour
 {
@@ -12,12 +13,17 @@ public class player : MonoBehaviour
     private bool placeMode;
     private int selectedType = 1;
 
+    public Image panel;
+    public Slider healthBar;
+    public int health = 100;
+
     public GameObject ghost;
     public Text resource1;
     public Text resource2;
 
     public int wood = 0;
     public int steel = 0;
+    private float alpha = 0.0f;
 
     // Start is called before the first frame update
     void Start()
@@ -29,11 +35,14 @@ public class player : MonoBehaviour
         {
             inventory[i].GetComponent<Outline>().enabled = false;
         }
+
+        panel.color = new Color(1, 0, 0, alpha);
     }
 
     // Update is called once per frame
     void Update()
     {
+        
         if (placeMode)
         {
             RaycastHit hit;
@@ -157,12 +166,18 @@ public class player : MonoBehaviour
             if(selectedInventory == 1)
             {
                 ghost.SetActive(true);
-                placeMode = true;
                 selectedType = 1;
-            } if (selectedInventory == 2)
-            {
                 placeMode = true;
+            }
+            else if (selectedInventory == 2)
+            {
                 selectedType = 2;
+                ghost.SetActive(true);
+                placeMode = true;
+            }
+            else
+            {
+                placeMode = false;
                 ghost.SetActive(false);
             }
 
@@ -184,18 +199,75 @@ public class player : MonoBehaviour
             {
                 pickaxe.SetActive(false);
             }
+
             if (selectedInventory == 1)
             {
-                placeMode = true;
                 selectedType = 1;
                 ghost.SetActive(true);
+                placeMode = true;
             }
-            if (selectedInventory == 2)
+            else if (selectedInventory == 2)
+            {
+                selectedType = 2;
+                ghost.SetActive(true);
+                placeMode = true;
+            }
+            else
             {
                 placeMode = false;
-                selectedType = 2;
                 ghost.SetActive(false);
             }
         }
+
+        if (alpha != 0)
+        {
+            alpha = alpha - 0.05f;
+            panel.color = new Color(1, 0, 0, alpha);
+        }
+
     }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.name.Contains("Pickup"))
+        {
+            if (other.name.Contains("wood"))
+            {
+                wood += 1;
+                resource1.text = "Wood: " + wood;
+            }
+            if (other.name.Contains("steel"))
+            {
+                steel += 1;
+                resource2.text = "Steel: " + steel;
+            }
+            Destroy(other.gameObject);
+        }
+    }
+
+    public void takeDamage(int damage)
+    {
+        health = health - damage;
+        healthBar.value = health;
+        
+        if (health <= 0)
+        {
+            StartCoroutine(timeToDie());
+        }
+
+        alpha = 0.6f;
+        panel.color = new Color(1, 0, 0, alpha);
+    }
+
+    private IEnumerator timeToDie()
+    {
+        transform.Translate(-Vector3.up * Time.deltaTime);
+        transform.Rotate(new Vector3(90,0,30));
+        alpha = 0.8f;
+        panel.color = new Color(.5f, 0, 0, alpha);
+        yield return new WaitForSeconds(2f);
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+
+    }
+
 }

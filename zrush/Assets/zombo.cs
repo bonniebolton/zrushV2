@@ -22,6 +22,7 @@ public class zombo : MonoBehaviour
 
     private Animator anim;
     private Canvas canva;
+    private bool isDead = false;
 
 
     // Start is called before the first frame update
@@ -65,7 +66,7 @@ public class zombo : MonoBehaviour
         transform.rotation = Quaternion.Slerp(transform.rotation, rotation, Time.deltaTime * 5);
 
 
-        if (isMove && rb.velocity.magnitude < maxSpeed)
+        if (isMove && rb.velocity.magnitude < maxSpeed && isDead == false)
         {
             rb.AddForce(transform.forward * speed * Random.Range(.7f, 1.1f));
         }
@@ -81,6 +82,7 @@ public class zombo : MonoBehaviour
         if (health <= 0)
         {
             isMove = false;
+            isDead = true;
             StartCoroutine(timeToDie());
         }
     }
@@ -90,8 +92,6 @@ public class zombo : MonoBehaviour
         if (other.tag == "Player")
         {
             isMove = false;
-            anim.SetTrigger("AttackPlayer");
-            print("hurt the player");
         }
         else if (other.tag == "placed")
         {
@@ -101,24 +101,36 @@ public class zombo : MonoBehaviour
 
     private void OnTriggerStay(Collider other)
     {
-        if (other.tag == "placed" && target == other.gameObject)
+        if (isDead == false)
         {
-            if (coolDown % 60 == 0)
+            if (other.tag == "placed" && target == other.gameObject)
             {
-                anim.SetTrigger("AttackBox");
-                other.GetComponent<placedObject>().takeDamage(5);
-                print("punch box");
+                if (coolDown % 60 == 0)
+                {
+                    anim.SetTrigger("AttackBox");
+                    other.GetComponent<placedObject>().takeDamage(5);
+                }
+                coolDown += 1;
             }
-            coolDown += 1;
-        }
-        if ((other.tag == "wood" || other.tag == "steel" || other.tag == "enemy") && target == player && isMove)
-        {
-            if (rb.velocity.magnitude < maxSpeed * 1.5)
+            if ((other.tag == "wood" || other.tag == "steel" || other.tag == "enemy") && target == player && isMove)
             {
-                rb.AddForce(transform.forward * -speed * 1.5f);
-                rb.AddForce(transform.right * speed * 2);
+                if (rb.velocity.magnitude < maxSpeed * 1.5)
+                {
+                    rb.AddForce(transform.forward * -speed * 1.5f);
+                    rb.AddForce(transform.right * speed * 2);
+                }
+            }
+            if ((other.gameObject == player))
+            {
+                if (coolDown % 60 == 0)
+                {
+                    anim.SetTrigger("AttackPlayer");
+                    other.GetComponent<player>().takeDamage(5);
+                }
+                coolDown += 1;
             }
         }
+        
     }
 
     private void OnTriggerExit(Collider other)
@@ -126,7 +138,6 @@ public class zombo : MonoBehaviour
         if (other.tag == "Player")
         {
             isMove = true;
-            print("chase!");
         }
     }
 
