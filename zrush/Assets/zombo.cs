@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class zombo : MonoBehaviour
 {
@@ -12,10 +13,15 @@ public class zombo : MonoBehaviour
     private Rigidbody rb;
     public float speed;
     public float maxSpeed;
+    public Image healthBar;
+    [HideInInspector]
+    public int health = 50;
+
     [HideInInspector]
     public float coolDown;
 
     private Animator anim;
+    private Canvas canva;
 
 
     // Start is called before the first frame update
@@ -25,6 +31,9 @@ public class zombo : MonoBehaviour
         target = player;
         rb = GetComponent<Rigidbody>();
         anim = GetComponent<Animator>();
+        canva = GetComponentInChildren<Canvas>();
+        canva.worldCamera = Camera.main;
+        canva.gameObject.SetActive(false);
     }
 
     // Update is called once per frame
@@ -62,6 +71,20 @@ public class zombo : MonoBehaviour
         }
     }
 
+    public void takeDamage(int damage)
+    {
+        canva.gameObject.SetActive(true);
+        health = health - damage;
+        healthBar.rectTransform.anchorMax = new Vector2((float)health/50,.9f);
+        rb.AddForce(transform.forward * -100);
+        rb.AddForce(transform.up * 70);
+        if (health <= 0)
+        {
+            isMove = false;
+            StartCoroutine(timeToDie());
+        }
+    }
+
     private void OnTriggerEnter(Collider other)
     {
         if (other.tag == "Player")
@@ -88,7 +111,7 @@ public class zombo : MonoBehaviour
             }
             coolDown += 1;
         }
-        if (other.tag == "wood" && target == player && isMove)
+        if ((other.tag == "wood" || other.tag == "steel" || other.tag == "enemy") && target == player && isMove)
         {
             if (rb.velocity.magnitude < maxSpeed * 1.5)
             {
@@ -105,5 +128,13 @@ public class zombo : MonoBehaviour
             isMove = true;
             print("chase!");
         }
+    }
+
+    private IEnumerator timeToDie()
+    {
+        anim.SetTrigger("Death");
+        transform.Translate(-Vector3.up * Time.deltaTime);
+        yield return new WaitForSeconds(2f);
+        Destroy(gameObject);
     }
 }
