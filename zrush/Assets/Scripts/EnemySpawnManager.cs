@@ -34,11 +34,13 @@ public class EnemySpawnManager : MonoBehaviour
 
     void Spawn()
     {
-        int i = currentSpawnPoint;
 
         //if the player is in level 1
         if(LevelLocation == 1)
         {
+
+            int i = currentSpawnPoint;
+
             //creates a zombie at the next level 1 spawn point
             Instantiate(Resources.Load("Zombie"), Level1SpawnPoints[i].position, Level1SpawnPoints[i].rotation);
 
