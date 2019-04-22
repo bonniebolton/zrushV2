@@ -112,7 +112,7 @@ public class zombo : MonoBehaviour
                 }
                 coolDown += 1;
             }
-            if ((other.tag == "wood" || other.tag == "steel" || other.tag == "enemy") && target == player && isMove)
+            if ((other.tag == "wood" || other.tag == "steel") && target == player && isMove)
             {
                 if (rb.velocity.magnitude < maxSpeed * 1.5)
                 {

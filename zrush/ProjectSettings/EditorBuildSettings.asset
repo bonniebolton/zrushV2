@@ -6,6 +6,6 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/SampleScene.unity
+    path: Assets/Scenes/bigdickenergy.unity
     guid: ec5760cfb598de141a9f43a7e651e3fa
   m_configObjects: {}

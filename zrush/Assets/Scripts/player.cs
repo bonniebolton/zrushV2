@@ -50,7 +50,7 @@ public class player : MonoBehaviour
 
             if (Physics.Raycast(ray, out hit))
             {
-                if ((selectedType == 1 && wood >=5) || (selectedType == 2 && steel >= 10))
+                if ((selectedType == 1 && wood >=5) || (selectedType == 2 && steel >= 10 && wood >=2))
                 {
                     ghost.SetActive(true);
                     ghost.transform.position = hit.point;
@@ -64,6 +64,8 @@ public class player : MonoBehaviour
                     {
                         Instantiate(Resources.Load("PlaceableSteel"), ghost.transform.position, ghost.transform.rotation);
                         steel -= 10;
+                        wood -= 2;
+                        resource1.text = "Wood: " + wood;
                         resource2.text = "Steel: " + steel;
                     }
                 }
